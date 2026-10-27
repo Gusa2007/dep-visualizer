@@ -5,6 +5,7 @@ import sys
 
 import config
 import graph as graph_module
+import render
 import repository
 
 DEFAULT_CONFIG = "examples/test_simple.ini"
@@ -68,6 +69,17 @@ def print_order(built):
     print(SEPARATOR)
 
 
+def print_views(built, settings):
+    """Вывести описание графа и, если задано, ASCII-дерево."""
+    print("Описание графа на языке Graphviz:")
+    print(render.to_dot(built))
+    print(SEPARATOR)
+    if settings.ascii_tree:
+        print("Дерево зависимостей:")
+        print(render.to_ascii(built))
+        print(SEPARATOR)
+
+
 def run(args):
     """Выполнить все шаги работы визуализатора."""
     settings = config.load(args.config)
@@ -79,6 +91,7 @@ def run(args):
     print_graph_info(built)
     if args.order:
         print_order(built)
+    print_views(built, settings)
 
 
 def main(argv=None):
