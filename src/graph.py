@@ -105,3 +105,32 @@ def walk(graph, stack, path, color, cycles):
             color[child] = GREY
             path.append(child)
             stack.append((child, iter(graph.children(child))))
+
+
+def install_order(graph):
+    """Порядок загрузки: зависимости раньше зависящих пакетов.
+
+    Используется алгоритм Кана. Если из-за цикла ни один пакет не
+    готов, цикл разрывается: берётся самый глубокий из оставшихся
+    пакетов, при равной глубине -- первый по алфавиту.
+    Возвращает пару (порядок, список разорванных пакетов).
+    """
+    waiting = {node: set(graph.children(node)) for node in graph.nodes}
+    order = []
+    broken = []
+    while waiting:
+        ready = sorted(name for name, deps in waiting.items() if not deps)
+        if not ready:
+            ready = [deepest(graph, waiting)]
+            broken.append(ready[0])
+        for name in ready:
+            order.append(name)
+            del waiting[name]
+        for deps in waiting.values():
+            deps.difference_update(ready)
+    return order, broken
+
+
+def deepest(graph, waiting):
+    """Самый глубокий из оставшихся пакетов (для разрыва цикла)."""
+    return sorted(waiting, key=lambda name: (-graph.depth[name], name))[0]

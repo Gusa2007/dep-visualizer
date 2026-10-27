@@ -22,6 +22,9 @@ def parse_args(argv=None):
         "--config", default=DEFAULT_CONFIG, metavar="PATH",
         help=f"путь к INI-файлу конфигурации (по умолчанию "
              f"{DEFAULT_CONFIG})")
+    parser.add_argument(
+        "--order", action="store_true",
+        help="вывести порядок загрузки зависимостей")
     return parser.parse_args(argv)
 
 
@@ -54,6 +57,17 @@ def print_graph_info(built):
     print(SEPARATOR)
 
 
+def print_order(built):
+    """Вывести порядок загрузки зависимостей."""
+    order, broken = graph_module.install_order(built)
+    print("Порядок загрузки (зависимости раньше зависящих):")
+    for number, name in enumerate(order, start=1):
+        print(f"  {number:>3}. {name}")
+    if broken:
+        print("Циклы разорваны на пакетах: " + ", ".join(broken))
+    print(SEPARATOR)
+
+
 def run(args):
     """Выполнить все шаги работы визуализатора."""
     settings = config.load(args.config)
@@ -63,6 +77,8 @@ def run(args):
     built = graph_module.build(repo, settings.package,
                                settings.max_depth)
     print_graph_info(built)
+    if args.order:
+        print_order(built)
 
 
 def main(argv=None):
