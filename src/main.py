@@ -4,6 +4,7 @@ import argparse
 import sys
 
 import config
+import graph as graph_module
 import repository
 
 DEFAULT_CONFIG = "examples/test_simple.ini"
@@ -42,12 +43,26 @@ def print_direct(repo, settings):
     print(SEPARATOR)
 
 
+def print_graph_info(built):
+    """Вывести размер графа, циклы и ненайденные пакеты."""
+    print(f"Граф: вершин {len(built.nodes)}, "
+          f"рёбер {built.count_edges()}")
+    for cycle in graph_module.find_cycles(built):
+        print("Цикл: " + " -> ".join(cycle))
+    for name, reason in built.missing.items():
+        print(f"Пропущено: {reason}")
+    print(SEPARATOR)
+
+
 def run(args):
     """Выполнить все шаги работы визуализатора."""
     settings = config.load(args.config)
     print_settings(settings)
     repo = repository.create(settings)
     print_direct(repo, settings)
+    built = graph_module.build(repo, settings.package,
+                               settings.max_depth)
+    print_graph_info(built)
 
 
 def main(argv=None):
