@@ -1,0 +1,9 @@
+[project]
+name = "dep-visualizer"
+version = "0.1.0"
+description = "Визуализатор графа зависимостей пакетов Ubuntu (apt)"
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

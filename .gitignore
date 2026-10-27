@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Сборка и сгенерированные файлы
+build/
+dist/
+*.egg-info/
+*.gz
+*.png
+*.svg
+
+# Редакторы и ОС
+.idea/
+.vscode/
+*.swp
+.DS_Store
