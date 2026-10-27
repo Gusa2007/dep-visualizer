@@ -4,6 +4,7 @@ import argparse
 import sys
 
 import config
+import repository
 
 DEFAULT_CONFIG = "examples/test_simple.ini"
 EXIT_OK = 0
@@ -31,10 +32,22 @@ def print_settings(settings):
     print(SEPARATOR)
 
 
+def print_direct(repo, settings):
+    """Вывести прямые зависимости заданного пакета."""
+    direct = repo.direct(settings.package)
+    print(f"Прямые зависимости пакета '{settings.package}' "
+          f"({len(direct)}):")
+    for name in direct:
+        print(f"  {name}")
+    print(SEPARATOR)
+
+
 def run(args):
     """Выполнить все шаги работы визуализатора."""
     settings = config.load(args.config)
     print_settings(settings)
+    repo = repository.create(settings)
+    print_direct(repo, settings)
 
 
 def main(argv=None):
@@ -42,7 +55,7 @@ def main(argv=None):
     args = parse_args(argv)
     try:
         run(args)
-    except config.ConfigError as exc:
+    except (config.ConfigError, repository.RepositoryError) as exc:
         print(f"Ошибка: {exc}", file=sys.stderr)
         return EXIT_ERROR
     return EXIT_OK
